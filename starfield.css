@@ -8,4 +8,5 @@ canvas {
     position: absolute;
     left: 0px;
     top: 0px;
+    background-image: url('star-clouds.jpg');
 }

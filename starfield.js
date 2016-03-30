@@ -43,7 +43,7 @@ function init() {
         if (x < 0.75) b=(x-0.5)*max/0.25;
         else b=max;
         
-        return rgb(r, g, b);
+        return Color.rgb(r, g, b);
     }
     
 	function drawStar(x, y, scale, color, lum) {
@@ -86,7 +86,7 @@ function init() {
     var COUNT = (WIDTH*HEIGHT) / 100;
     
     var area = [rnd(WIDTH), rnd(HEIGHT)]
-    for (var i = 0; i < 25; i++) {
+    for (var i = 0; i < 0; i++) {
         drawStar(
             area[0]+200*getGaussian()(rnd()),
             area[1]+200*getGaussian()(rnd()),
