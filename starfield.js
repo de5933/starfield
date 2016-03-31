@@ -3,6 +3,7 @@ function init() {
 	var ctx = canvas.getContext("2d");
 	var WIDTH = canvas.width;
 	var HEIGHT = canvas.height;
+    var resolution = WIDTH*HEIGHT;
     
     function getGaussian(a, b, c) {
         a = typeof(a)=='number'? a : 1;
@@ -47,23 +48,24 @@ function init() {
     }
     
 	function drawStar(x, y, scale, color, lum) {
-		if (!scale)
-			scale = 1;
-		var r = scale / 2;
-        var c = color || Color.WHITE;
-        c = c.avg(Color.WHITE);
-        c.a = 0.1;
+		if (!scale) scale = 1;
+        if (!lum) lum = 1;
+        if (!color) color = Color.WHITE;
         
-		ctx.fillStyle = c;
+		var r = scale / 2;
+        color = color.avg(Color.WHITE);
+        color.a = 0.1;
+        
+		ctx.fillStyle = color;
         
         // Halo
         ctx.beginPath();
-        ctx.arc(x, y, 5*r, 0, 2*Math.PI);
+        ctx.arc(x, y, 5*r*lum, 0, 2*Math.PI);
         ctx.fill();
 
         // Star
-        c.a = 1;
-        ctx.fillStyle = c;
+        color.a = 1;
+        ctx.fillStyle = color;
 		ctx.beginPath();
 		ctx.moveTo(x, y - r);
 		ctx.lineTo(x - r, y);
@@ -83,35 +85,38 @@ function init() {
 		ctx.fill();
 	}
 
-    var COUNT = (WIDTH*HEIGHT) / 100;
     
-    var area = [rnd(WIDTH), rnd(HEIGHT)]
-    for (var i = 0; i < 0; i++) {
-        drawStar(
-            area[0]+200*getGaussian()(rnd()),
-            area[1]+200*getGaussian()(rnd()),
-            rnd(10),
-            Color.GREEN
-        );
+    
+    function starField(count) {
+        
+        for (var i = 0; i < count; i++) {
+            // The distance between the star and the camera
+            var scale = 1-Math.pow(rnd(), 1/8);
+
+            // The color and brightness of the star
+            var t = Math.pow(rnd(), 2);
+            
+            drawStar(
+                rnd(WIDTH),
+                rnd(HEIGHT),
+                10*scale,
+                thermalColor(t),
+                t
+            );
+        }
     }
     
-	for (var i = 0; i < COUNT; i++) {
-        // The distance between the star and the camera
-		var scale = 1-Math.pow(rnd(), 1/8);
-
-		// The color and brightness of the star
-		var t = Math.pow(rnd(), 2);
-        
-        var seed = rnd();
-        var w = rnd(WIDTH);
-        
-		drawStar(
-			w,
-			(0.5+Math.tan(w)/2)*HEIGHT,
-			10*scale,
-			thermalColor(t),
-            t
-        );
-	}
-
+    starField(WIDTH*HEIGHT/100);
+    
+    drawStar(
+    rnd(WIDTH), rnd(HEIGHT),
+    25, thermalColor(0.5), 1);
+    
+    drawStar(
+    rnd(WIDTH), rnd(HEIGHT),
+    25, thermalColor(0.1), 1);
+    
+    drawStar(
+    rnd(WIDTH), rnd(HEIGHT),
+    25, thermalColor(1), 1);
 }
