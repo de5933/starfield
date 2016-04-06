@@ -1,6 +1,7 @@
 function init() {
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
+	var canvas = document.getElementById('canvas');
+	var svg = document.getElementById('svg');
+	var ctx = canvas.getContext('2d');
 	var WIDTH = canvas.width;
 	var HEIGHT = canvas.height;
     var resolution = WIDTH*HEIGHT;
@@ -47,7 +48,7 @@ function init() {
         return Color.rgb(r, g, b);
     }
     
-	function drawStar(x, y, scale, color, lum) {
+	function drawStarCanvas(x, y, scale, color, lum) {
 		if (!scale) scale = 1;
         if (!lum) lum = 1;
         if (!color) color = Color.WHITE;
@@ -85,8 +86,69 @@ function init() {
 		ctx.fill();
 	}
 
+    function drawStarSVG(x, y, scale, color, lum) {
+		if (!scale) scale = 1;
+        if (!lum) lum = 1;
+        if (!color) color = Color.WHITE;
+        
+		var r = scale / 2;
+        color = color.avg(Color.WHITE);
+		
+		// Halo
+		
+		color.a = 0.1;
+		var haloRadius = 5*r*lum;
+		
+		if (haloRadius > 2 && haloRadius > r) {
+			var halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			halo.setAttribute('class', 'halo');
+			halo.setAttribute('cx', x);
+			halo.setAttribute('cy', y);
+			halo.setAttribute('r', haloRadius);
+			halo.setAttribute('fill', color);
+			svg.appendChild(halo);
+		}
+		
+		// Star
+		
+		color.a = 1;
+		
+		var star = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		star.setAttribute('class', 'star');
+		star.setAttribute('d', [
+			'M', x, y,
+			'h', -r,
+			'l', r, r,
+			'l', r, -r,
+			'l', -r, -r,
+			'l', -r, r,
+			'z'
+		].join(' '));
+		star.setAttribute('fill', color);
+		svg.appendChild(star);
+		
+		
+		// Core
+		r = r/2;
+		
+		if (r >= 1) {
+			var core = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+			core.setAttribute('d', [
+				'M', x, y,
+				'h', -r,
+				'l', r, r,
+				'l', r, -r,
+				'l', -r, -r,
+				'l', -r, r,
+				'z'
+			].join(' '));
+			core.setAttribute('fill', Color.WHITE);
+			svg.appendChild(core);
+		}
+	}
     
-    
+	var drawStar = drawStarSVG;
+	
     function starField(count) {
         
         for (var i = 0; i < count; i++) {
