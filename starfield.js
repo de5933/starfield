@@ -54,7 +54,7 @@ function init() {
         if (!color) color = Color.WHITE;
         
 		var r = scale / 2;
-        color = color.avg(Color.WHITE);
+        //color = color.avg(Color.WHITE);
         color.a = 0.1;
         
 		ctx.fillStyle = color;
@@ -147,8 +147,39 @@ function init() {
 		}
 	}
     
-	var drawStar = drawStarSVG;
+	var drawStar = drawStarCanvas;
 	
+    function addSpot(x, y, size, blur, color) {
+        if (x==null) x=Math.random()*WIDTH;
+        if (y==null) y=Math.random()*HEIGHT;
+        if (size==null) size=30 + 100*Math.random();
+        if (blur==null) blur=(100+100*Math.random())+'px';
+        if (color==null) color = thermalColor(Math.random());
+
+        var spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        spot.setAttribute('cx', x);
+        spot.setAttribute('cy', y);
+        spot.setAttribute('r', size);
+        spot.setAttribute('style', 'fill:' + color + '; filter: blur(' + blur + ')');
+        svg.appendChild(spot);
+    }
+
+    function getPos(scale, t) {
+        //var x = rnd(WIDTH);
+        //var y = HEIGHT*(0.5 + (Math.round(rnd())*2-1)*Math.pow(rnd(),x*2/WIDTH));
+        
+        x=t*WIDTH+rnd(100);
+        y=t*HEIGHT+rnd(100);
+        
+        x=WIDTH*scale
+        y=HEIGHT*t;
+        
+        x=rnd(WIDTH);
+        y=rnd(HEIGHT);
+        
+        return {x:x, y:y};
+    }
+    
     function starField(count) {
         
         for (var i = 0; i < count; i++) {
@@ -156,16 +187,21 @@ function init() {
             var scale = 1-Math.pow(rnd(), 1/8);
 
             // The color and brightness of the star
-            var t = Math.pow(rnd(), 2);
+            var t = 1-Math.pow(rnd(), 1/3);
+            var pos = getPos(scale, t);
             
             drawStar(
-                rnd(WIDTH),
-                rnd(HEIGHT),
+                pos.x,
+                pos.y,
                 10*scale,
                 thermalColor(t),
                 t
             );
         }
+    }
+    
+    for (var i = 0; i < 10; i++) {
+        addSpot();
     }
     
     starField(WIDTH*HEIGHT/100);
@@ -181,4 +217,9 @@ function init() {
     drawStar(
     rnd(WIDTH), rnd(HEIGHT),
     25, thermalColor(1), 1);
+    
+    (function callback(){
+        starField(1000);
+        setTimeout(callback, 10);
+    });
 }
