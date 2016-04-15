@@ -60,18 +60,23 @@ function init() {
         
 		var r = scale / 2;
         color = color.avg(Color.WHITE);
-        color.a = 0.1;
+        color.a = 0.5;
         
 		ctx.fillStyle = color;
         
         // Halo
+        var gradient = ctx.createRadialGradient(x,y, r/2, x,y,5*r*lum);
+        gradient.addColorStop(0,color);
+        gradient.addColorStop(1,Color.rgba(0,0,0,0));
+        ctx.fillStyle = gradient;
+        
         ctx.beginPath();
         ctx.arc(x, y, 5*r*lum, 0, 2*Math.PI);
         ctx.fill();
 
         // Star
         color.a = 1;
-        ctx.fillStyle = color;
+        ctx.fillStyle = Color.WHITE;
 		ctx.beginPath();
 		ctx.moveTo(x, y - r);
 		ctx.lineTo(x - r, y);
@@ -203,7 +208,7 @@ function init() {
                 pos.y,
                 10*scale,
                 thermalColor(t),
-                t
+                1
             );
         }
     }
