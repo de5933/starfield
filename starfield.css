@@ -2,11 +2,9 @@ body {
     background-color: #000;
     margin: none;
     padding: none;
-	background-image: url('star-clouds.jpg');
+	background-image: url('star-clouds.');
 }
 
 canvas, svg {
     position: absolute;
-    left: 0px;
-    top: 0px;
 }

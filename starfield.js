@@ -6,6 +6,11 @@ function init() {
 	var HEIGHT = canvas.height;
     var resolution = WIDTH*HEIGHT;
     
+    function setCanvas(c) {
+        canvas = c;
+        ctx = canvas.getContext('2d');
+    }
+    
     function getGaussian(a, b, c) {
         a = typeof(a)=='number'? a : 1;
         b = typeof(b)=='number'? b : 1;
@@ -54,7 +59,7 @@ function init() {
         if (!color) color = Color.WHITE;
         
 		var r = scale / 2;
-        //color = color.avg(Color.WHITE);
+        color = color.avg(Color.WHITE);
         color.a = 0.1;
         
 		ctx.fillStyle = color;
@@ -165,22 +170,25 @@ function init() {
     }
 
     function getPos(scale, t) {
-        //var x = rnd(WIDTH);
-        //var y = HEIGHT*(0.5 + (Math.round(rnd())*2-1)*Math.pow(rnd(),x*2/WIDTH));
         
-        x=t*WIDTH+rnd(100);
-        y=t*HEIGHT+rnd(100);
+        var mode = 1;
+       
+       // Sorted by color
+        if (mode==0) return {
+            x:(1-t)*WIDTH+rnd(100),
+            y:(1-t)*HEIGHT+rnd(100)
+        };
         
-        x=WIDTH*scale
-        y=HEIGHT*t;
-        
-        x=rnd(WIDTH);
-        y=rnd(HEIGHT);
-        
-        return {x:x, y:y};
+        // Random
+        if (mode==1) return {
+            x:rnd(WIDTH),
+            y:rnd(HEIGHT)
+        };
     }
     
-    function starField(count) {
+    function starField(count, newcanvas) {
+        
+        setCanvas(newcanvas || canvas);
         
         for (var i = 0; i < count; i++) {
             // The distance between the star and the camera
@@ -204,7 +212,11 @@ function init() {
         addSpot();
     }
     
-    starField(WIDTH*HEIGHT/100);
+     var layers = document.getElementsByTagName('canvas');
+    
+    for (var i = 0; i < layers.length; i++) {
+        starField(WIDTH*HEIGHT/1000, layers[i]);
+    }
     
     drawStar(
     rnd(WIDTH), rnd(HEIGHT),
@@ -218,8 +230,15 @@ function init() {
     rnd(WIDTH), rnd(HEIGHT),
     25, thermalColor(1), 1);
     
+    // Keep adding stars
     (function callback(){
         starField(1000);
         setTimeout(callback, 10);
     });
+    
+    parallaxInit({
+        x0: -WIDTH/2,
+        y0: -HEIGHT/2
+    });
+    
 }
