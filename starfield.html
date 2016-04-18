@@ -11,9 +11,10 @@
 	<meta charset="utf-8"/>
 </head>
 <body onload="init()">
-    <img src="dark-nebulae.png" style="position: absolute; top:0; left:0" data-parallax="0.5"/>
-	<svg id="svg" width="1920" height="1080" style="display:none"></svg>
-    <canvas id="canvas" width="1920" height="1080" data-parallax="1.0"></canvas>
+    <img src="dark-nebulae.png" style="position: absolute; top:0; left:0; z-index:2; opacity:0.5" data-parallax="0.5"/>
+    <img src="red-clouds.png" style="position: absolute; top:0; left:0; display:none" data-parallax="0.5"/>
+	<svg id="svg" width="1920" height="1080"></svg>
+    <canvas id="canvas" width="1920" height="1080" data-parallax="1.0" style="z-index:3"></canvas>
     <canvas width="1920" height="1080" data-parallax="0.9"></canvas>
     <canvas width="1920" height="1080" data-parallax="0.8"></canvas>
     <canvas width="1920" height="1080" data-parallax="0.7"></canvas>

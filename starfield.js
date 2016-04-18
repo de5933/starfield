@@ -67,7 +67,7 @@ function init() {
         // Halo
         var gradient = ctx.createRadialGradient(x,y, r/2, x,y,5*r*lum);
         gradient.addColorStop(0,color);
-        gradient.addColorStop(1,Color.rgba(0,0,0,0));
+        gradient.addColorStop(1,Color.rgba(color.r,color.g,color.b,0));
         ctx.fillStyle = gradient;
         
         ctx.beginPath();
@@ -164,13 +164,14 @@ function init() {
         if (y==null) y=Math.random()*HEIGHT;
         if (size==null) size=30 + 100*Math.random();
         if (blur==null) blur=(100+100*Math.random())+'px';
-        if (color==null) color = thermalColor(Math.random());
+        if (color==null) color = Color.random();
+        color.a = 0.5;
 
         var spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         spot.setAttribute('cx', x);
         spot.setAttribute('cy', y);
         spot.setAttribute('r', size);
-        spot.setAttribute('style', 'fill:' + color + '; filter: blur(' + blur + ')');
+        spot.setAttribute('style', 'fill:' + color.toString() + '; filter: blur(' + blur + ')');
         svg.appendChild(spot);
     }
 
@@ -213,27 +214,19 @@ function init() {
         }
     }
     
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < 50; i++) {
         addSpot();
     }
     
      var layers = document.getElementsByTagName('canvas');
     
-    for (var i = 0; i < layers.length; i++) {
+    for (var i = 0; i < 1; i++) {
         starField(WIDTH*HEIGHT/1000, layers[i]);
     }
     
-    drawStar(
-    rnd(WIDTH), rnd(HEIGHT),
-    25, thermalColor(0.5), 1);
-    
-    drawStar(
-    rnd(WIDTH), rnd(HEIGHT),
-    25, thermalColor(0.1), 1);
-    
-    drawStar(
-    rnd(WIDTH), rnd(HEIGHT),
-    25, thermalColor(1), 1);
+    //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(0.5), 1);
+    //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(0.1), 1);
+    //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(1), 1);
     
     // Keep adding stars
     (function callback(){
@@ -241,9 +234,6 @@ function init() {
         setTimeout(callback, 10);
     });
     
-    parallaxInit({
-        x0: -WIDTH/2,
-        y0: -HEIGHT/2
-    });
+    //parallaxInit({x0: -WIDTH/2, y0: -HEIGHT/2 });
     
 }
