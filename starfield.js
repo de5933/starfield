@@ -6,6 +6,11 @@ function init() {
 	var HEIGHT = canvas.height;
     var resolution = WIDTH*HEIGHT;
     
+    /* Draw Mode */
+    // 0 = Gradient Mode
+    // 1 = Disc Mode
+    var drawmode = 1;
+    
     function setCanvas(c) {
         canvas = c;
         ctx = canvas.getContext('2d');
@@ -60,15 +65,23 @@ function init() {
         
 		var r = scale / 2;
         color = color.avg(Color.WHITE);
-        color.a = 0.5;
-        
-		ctx.fillStyle = color;
-        
+
         // Halo
-        var gradient = ctx.createRadialGradient(x,y, r/2, x,y,5*r*lum);
-        gradient.addColorStop(0,color);
-        gradient.addColorStop(1,Color.rgba(color.r,color.g,color.b,0));
-        ctx.fillStyle = gradient;
+        if (drawmode == 0) {
+            color.a = 0.5;
+            ctx.fillStyle = color;
+            
+            var gradient = ctx.createRadialGradient(x,y, r/2, x,y,5*r*lum);
+            gradient.addColorStop(0,color);
+            gradient.addColorStop(1,Color.rgba(color.r,color.g,color.b,0));
+            ctx.fillStyle = gradient;
+            
+            color = Color.WHITE;
+        }
+        else {
+            color.a = 0.1;
+            ctx.fillStyle = color;
+        }
         
         ctx.beginPath();
         ctx.arc(x, y, 5*r*lum, 0, 2*Math.PI);
@@ -76,7 +89,7 @@ function init() {
 
         // Star
         color.a = 1;
-        ctx.fillStyle = Color.WHITE;
+        ctx.fillStyle = color;
 		ctx.beginPath();
 		ctx.moveTo(x, y - r);
 		ctx.lineTo(x - r, y);
@@ -85,15 +98,17 @@ function init() {
 		ctx.fill();
         
         // Center
-        r = r / 2;
-        ctx.fillStyle = 'white';
-        
-        ctx.beginPath();
-		ctx.moveTo(x, y - r);
-		ctx.lineTo(x - r, y);
-		ctx.lineTo(x, y + r);
-		ctx.lineTo(x + r, y);
-		ctx.fill();
+        if (drawmode != 0) {
+            r = r / 2;
+            ctx.fillStyle = Color.WHITE;
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y - r);
+            ctx.lineTo(x - r, y);
+            ctx.lineTo(x, y + r);
+            ctx.lineTo(x + r, y);
+            ctx.fill();
+        }
 	}
 
     function drawStarSVG(x, y, scale, color, lum) {
@@ -221,7 +236,7 @@ function init() {
      var layers = document.getElementsByTagName('canvas');
     
     for (var i = 0; i < 1; i++) {
-        starField(WIDTH*HEIGHT/1000, layers[i]);
+        starField(WIDTH*HEIGHT/100, layers[i]);
     }
     
     //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(0.5), 1);
