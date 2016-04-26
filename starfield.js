@@ -174,19 +174,17 @@ function init() {
     
 	var drawStar = drawStarCanvas;
 	
-    function addSpot(x, y, size, blur, color) {
+    function addSpot(x, y, size, blur) {
         if (x==null) x=Math.random()*WIDTH;
         if (y==null) y=Math.random()*HEIGHT;
         if (size==null) size=30 + 100*Math.random();
         if (blur==null) blur=(100+100*Math.random())+'px';
-        if (color==null) color = Color.random();
-        color.a = 0.5;
 
         var spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         spot.setAttribute('cx', x);
         spot.setAttribute('cy', y);
         spot.setAttribute('r', size);
-        spot.setAttribute('style', 'fill:' + color.toString() + '; filter: blur(' + blur + ')');
+        spot.setAttribute('style', 'fill: rgba(255,119,0,0.5); filter: blur(' + blur + ') hue-rotate(' + (360+180*rnd(1,-0.5)) + 'deg)');
         svg.appendChild(spot);
     }
 
