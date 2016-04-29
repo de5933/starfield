@@ -1,19 +1,30 @@
-function init() {
-	var canvas = document.getElementById('canvas');
-	var svg = document.getElementById('svg');
-	var ctx = canvas.getContext('2d');
-	var WIDTH = canvas.width;
-	var HEIGHT = canvas.height;
-    var resolution = WIDTH*HEIGHT;
-    
-    /* Draw Mode */
-    // 0 = Gradient Mode
-    // 1 = Disc Mode
-    var drawmode = 1;
-    
-    function setCanvas(c) {
-        canvas = c;
-        ctx = canvas.getContext('2d');
+var Starfield = (function(){
+
+    function Starfield(target, width, height) {
+        this.target = target;
+
+        var nodeName = target.nodeName.toUpperCase();
+            
+        if (nodeName == 'CANVAS') mode = TARGET_CANVAS;
+        else if (nodeName == 'SVG') mode = TARGET_SVG;
+        else mode = TARGET_CANVAS;
+        
+        if (mode==TARGET_CANVAS) {
+            this.drawStar = drawStarCanvas;
+            this.drawSpot = function(){};
+            this.context = target.getContext('2d');
+            this.width = width || target.width;
+            this.height = height || target.height;
+        }
+        else if (mode == TARGET_SVG) {
+            this.drawStar = drawStarSVG;
+            this.drawSpot = drawSpot;
+            this.width = width || target.width.baseVal.value;
+            this.height = height || target.height.baseVal.value;
+        }
+        
+        this.drawmode = DRAW_DISK;
+        this.generate = generate;
     }
     
     function getGaussian(a, b, c) {
@@ -27,12 +38,6 @@ function init() {
             );
         };
     
-    }
-    
-    function rnd(scale, offset) {
-        if (typeof(scale)!='number') scale=1;
-        if (typeof(offset)!='number') offset=0;
-        return scale*Math.random()+offset;
     }
     
     function thermalColor(x) {
@@ -58,16 +63,24 @@ function init() {
         return Color.rgb(r, g, b);
     }
     
-	function drawStarCanvas(x, y, scale, color, lum) {
-		if (!scale) scale = 1;
+    function rnd(scale, offset) {
+        if (typeof(scale)!='number') scale=1;
+        if (typeof(offset)!='number') offset=0;
+        return scale*Math.random()+offset;
+    }
+    
+    function drawStarCanvas (x, y, scale, color, lum) {
+        if (!scale) scale = 1;
         if (!lum) lum = 1;
         if (!color) color = Color.WHITE;
+        
+        var ctx = this.context;
         
 		var r = scale / 2;
         color = color.avg(Color.WHITE);
 
         // Halo
-        if (drawmode == 0) {
+        if (this.drawmode == DRAW_GRADIENT) {
             color.a = 0.5;
             ctx.fillStyle = color;
             
@@ -98,7 +111,7 @@ function init() {
 		ctx.fill();
         
         // Center
-        if (drawmode != 0) {
+        if (this.drawmode != DRAW_GRADIENT) {
             r = r / 2;
             ctx.fillStyle = Color.WHITE;
             
@@ -109,12 +122,14 @@ function init() {
             ctx.lineTo(x + r, y);
             ctx.fill();
         }
-	}
-
+    };
+    
     function drawStarSVG(x, y, scale, color, lum) {
 		if (!scale) scale = 1;
         if (!lum) lum = 1;
         if (!color) color = Color.WHITE;
+        
+        var svg = this.target;
         
 		var r = scale / 2;
         color = color.avg(Color.WHITE);
@@ -170,15 +185,13 @@ function init() {
 			core.setAttribute('fill', Color.WHITE);
 			svg.appendChild(core);
 		}
-	}
+	};
     
-	var drawStar = drawStarCanvas;
-	
-    function addSpot(x, y, size, blur) {
-        if (x==null) x=Math.random()*WIDTH;
-        if (y==null) y=Math.random()*HEIGHT;
-        if (size==null) size=30 + 100*Math.random();
-        if (blur==null) blur=(100+100*Math.random())+'px';
+    function drawSpot(x, y, size, blur) {
+        if (x==null) x=rnd(this.width);
+        if (y==null) y=rnd(this.height);
+        if (size==null) size=30 + 100*rnd();
+        if (blur==null) blur=(100+100*rnd())+'px';
 
         var spot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         spot.setAttribute('cx', x);
@@ -187,66 +200,45 @@ function init() {
         spot.setAttribute('style', 'fill: rgba(255,119,0,0.5); filter: blur(' + blur + ') hue-rotate(' + (360+180*rnd(1,-0.5)) + 'deg)');
         svg.appendChild(spot);
     }
-
-    function getPos(scale, t) {
-        
-        var mode = 1;
-       
-       // Sorted by color
-        if (mode==0) return {
-            x:(1-t)*WIDTH+rnd(100),
-            y:(1-t)*HEIGHT+rnd(100)
-        };
-        
-        // Random
-        if (mode==1) return {
-            x:rnd(WIDTH),
-            y:rnd(HEIGHT)
-        };
-    }
     
-    function starField(count, newcanvas) {
+    function generate(starcount) {
         
-        setCanvas(newcanvas || canvas);
-        
-        for (var i = 0; i < count; i++) {
+        for (var i = 0; i < starcount; i++) {
             // The distance between the star and the camera
             var scale = 1-Math.pow(rnd(), 1/8);
 
             // The color and brightness of the star
             var t = 1-Math.pow(rnd(), 1/3);
-            var pos = getPos(scale, t);
             
-            drawStar(
-                pos.x,
-                pos.y,
+            this.drawStar(
+                rnd(this.width),
+                rnd(this.height),
                 10*scale,
                 thermalColor(t),
                 1
             );
         }
+        
+        var spotcount = (this.width * this.height) / 50000;
+        
+        for (var i = 0; i < spotcount; i++) {
+            this.drawSpot();
+        }
     }
+
+    var TARGET_CANVAS = Starfield.TARGET_CANVAS = 'canvas';
+    var TARGET_SVG = Starfield.TARGET_SVG = 'svg';
     
-    for (var i = 0; i < WIDTH*HEIGHT/50000; i++) {
-        addSpot();
-    }
+    var DRAW_DISK = Starfield.DRAW_DISK = 'disk';
+    var DRAW_GRADIENT = Starfield.DRAW_GRADIENT = 'gradient';
     
-     var layers = document.getElementsByTagName('canvas');
+    return Starfield;
+})();
+
+function init() {
+    var cField = new Starfield(document.getElementById('canvas'));
+    var sField = new Starfield(document.getElementById('svg'));
     
-    for (var i = 0; i < 1; i++) {
-        starField(WIDTH*HEIGHT/100, layers[i]);
-    }
-    
-    //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(0.5), 1);
-    //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(0.1), 1);
-    //drawStar( rnd(WIDTH), rnd(HEIGHT), 25, thermalColor(1), 1);
-    
-    // Keep adding stars
-    (function callback(){
-        starField(1000);
-        setTimeout(callback, 10);
-    });
-    
-    //parallaxInit({x0: -WIDTH/2, y0: -HEIGHT/2 });
-    
+    sField.generate(0);
+    cField.generate();
 }
