@@ -203,6 +203,9 @@ var Starfield = (function(){
     
     function generate(starcount) {
         
+		if (starcount == null)
+			starcount = ( (this.width*this.height) / 100);
+		
         for (var i = 0; i < starcount; i++) {
             // The distance between the star and the camera
             var scale = 1-Math.pow(rnd(), 1/8);
