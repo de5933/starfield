@@ -227,7 +227,7 @@ function init() {
         }
     }
     
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < WIDTH*HEIGHT/50000; i++) {
         addSpot();
     }
     
