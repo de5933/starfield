@@ -244,7 +244,7 @@ var Starfield = (function(){
             }
         }
     }
-    
+
     var TARGET_CANVAS = Starfield.TARGET_CANVAS = 'canvas';
     var TARGET_SVG = Starfield.TARGET_SVG = 'svg';
     
