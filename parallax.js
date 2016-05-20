@@ -18,7 +18,7 @@ function parallaxInit(settings){
     function update() {
         for (var i = 0; i < lst.length; i++) {
             var element = lst[i];
-            var parallax = parseFloat(element.dataset['parallax']);
+            var parallax = parseFloat(element.attributes['data-parallax']);
             var dx = (window.scrollX - win.x0) * parallax;
             var dy = (window.scrollY - win.y0) * parallax;
             element.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
@@ -30,7 +30,3 @@ function parallaxInit(settings){
 
     window.onscroll = update;
 };
-
-function init() {
-    parallaxInit();
-}
