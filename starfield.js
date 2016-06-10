@@ -12,9 +12,13 @@ var Starfield = (function(){
         if (mode==TARGET_CANVAS) {
             this.drawStar = drawStarCanvas;
             this.drawSpot = function(){};
+            this.drawGradientCanvas = drawGradientCanvas;
+            
             this.context = target.getContext('2d');
+            this.context.globalCompositeOperation = 'screen';
             this.width = width || target.width;
             this.height = height || target.height;
+            
             target.width = this.width;
             target.height = this.height;
         }
@@ -76,6 +80,11 @@ var Starfield = (function(){
         if (typeof(scale)!='number') scale=1;
         if (typeof(offset)!='number') offset=0;
         return scale*Math.random()+offset;
+    }
+    
+    function rndSign(scale) {
+        scale = scale || 1;
+        return Math.pow(-1, Math.ceil(rnd(2)))*scale;
     }
     
     function drawStarCanvas (x, y, scale, color, lum) {
@@ -212,9 +221,49 @@ var Starfield = (function(){
         spot.setAttribute('cx', x);
         spot.setAttribute('cy', y);
         spot.setAttribute('r', size);
-        spot.setAttribute('style', 'fill: rgba(255,119,0,0.5); filter: blur(' + blur + ') hue-rotate(' + (360+180*rnd(1,-0.5)) + 'deg)');
+        //spot.setAttribute('style', 'fill: rgba(255,119,0,0.5); filter: blur(' + blur + ') hue-rotate(' + (360+180*rnd(1,-0.5)) + 'deg)');
+        var c = Color.random(); c.a = 0.5; spot.setAttribute('style', 'fill: ' + c.toString() + '; filter: blur(' + blur + ')');
         this.target.appendChild(spot);
     }
+    
+    function drawGradientCanvas(x, y, r, color) {
+        if (!isNum(x)) x = rnd(this.width);
+        if (!isNum(y)) y = rnd(this.height);
+        if (!isNum(r)) r = rnd( (this.width+this.height) );
+        if (!color) color = Color.random();
+        
+        color = color.avg(Color.BLACK);
+        color.a = 0.5;
+        
+        var ctx = this.context;
+        var gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0,0,this.width,this.height);
+    }
+    
+    var position = {
+        random: function () {
+            return {
+                x: rnd(this.width),
+                y: rnd(this.height)
+            };
+        },
+        milkyway: function() {
+            return {
+                x: this.width*rnd(),
+                y: this.height*Math.pow(rnd(),2)/2*rndSign() + 0.5
+            };
+        },
+        graph: function(xaxis, yaxis, jitter) {
+            if (!isNum(jitter)) jitter = 0;
+            return {
+                x: this.height*(xaxis + rnd(jitter)),
+                y: this.width*(yaxis + rnd(jitter))
+            };
+        }
+    };
     
     function generate(starcount) {
         if (this.drawmode == DRAW_CLOUDS) {
@@ -229,16 +278,23 @@ var Starfield = (function(){
             
             for (var i = 0; i < starcount; i++) {
                 // The distance between the star and the camera
-                var scale = 1-Math.pow(rnd(), 1/8);
+                var scale = 10*(1-Math.pow(rnd(), 1/8));
 
                 // The color and brightness of the star
                 var t = 1-Math.pow(rnd(), 1/3);
                 
+                var color = thermalColor(t);
+                //var color = Color.random();
+                var hsl = getHSL(color);
+                
+                var pos = position.random.call(this);
+                //var pos = position.graph.call(this, hsl.h/360, hsl.l/255, 0);
+                
                 this.drawStar(
-                    this.width*rnd(),
-                    this.height*rnd(),
-                    10*scale,
-                    thermalColor(t),
+                    pos.x,
+                    pos.y,
+                    scale,
+                    color,
                     1
                 );
             }
@@ -259,16 +315,20 @@ var Starfield = (function(){
 function init(width, height) {
     width = width||innerWidth;
     height = height||innerHeight;
-    var cField = new Starfield(document.getElementById('canvas'), width, height);
+    var cField = new Starfield(document.getElementById('canvas1'), width, height);
     var sField = new Starfield(document.getElementById('svg1'), width, height);
     var nebula = new Starfield(document.getElementById('svg2'), width, height);
+    var cNebula = new Starfield(document.getElementById('canvas2'), width, height);
     
-    cField.drawmode = Starfield.DRAW_DIAMOND;
+    //cField.drawmode = Starfield.DRAW_GRADIENT;
     sField.drawmode = Starfield.DRAW_DIAMOND;
     nebula.drawmode = Starfield.DRAW_CLOUDS;
     
-    sField.generate(1000);
-    //cField.generate();
-    nebula.generate();
-    parallaxInit();
+    for (var i = 0; i < 3; i++) cNebula.drawGradientCanvas();
+    
+    //sField.generate(1000);
+    cField.generate();
+    //nebula.generate();
+    //parallaxInit();
+    
 }
