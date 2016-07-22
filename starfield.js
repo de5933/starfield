@@ -100,7 +100,7 @@ var Starfield = (function(){
 
         // Halo
         if (this.drawmode == DRAW_GRADIENT) {
-            color.a = 0.5;
+            color.a(0.5);
             ctx.fillStyle = color;
             
             var gradient = ctx.createRadialGradient(x,y, r/2, x,y,5*r*lum);
@@ -111,7 +111,7 @@ var Starfield = (function(){
             color = Color.WHITE;
         }
         else {
-            color.a = 0.1;
+            color.a(0.1);
             ctx.fillStyle = color;
         }
         
@@ -122,7 +122,7 @@ var Starfield = (function(){
         }
 
         // Star
-        color.a = 1;
+        color.a(1);
         ctx.fillStyle = color;
 		ctx.beginPath();
 		ctx.moveTo(x, y - r);
@@ -158,7 +158,7 @@ var Starfield = (function(){
 		
 		// Halo
 		if (this.drawmode == DRAW_GRADIENT || this.drawmode == DRAW_DISK) {
-            color.a = 0.1;
+            color.a(0.1);
             var haloRadius = 5*r*lum;
             
             if (haloRadius > 2 && haloRadius > r) {
@@ -174,7 +174,7 @@ var Starfield = (function(){
 		
 		// Star
 		
-		color.a = 1;
+		color.a(1);
 		
 		var star = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 		star.setAttribute('class', 'star');
@@ -222,7 +222,7 @@ var Starfield = (function(){
         spot.setAttribute('cy', y);
         spot.setAttribute('r', size);
         //spot.setAttribute('style', 'fill: rgba(255,119,0,0.5); filter: blur(' + blur + ') hue-rotate(' + (360+180*rnd(1,-0.5)) + 'deg)');
-        var c = Color.random(); c.a = 0.5; spot.setAttribute('style', 'fill: ' + c.toString() + '; filter: blur(' + blur + ')');
+        var c = Color.random(); c.a(0.5); spot.setAttribute('style', 'fill: ' + c.toString() + '; filter: blur(' + blur + ')');
         this.target.appendChild(spot);
     }
     
@@ -233,7 +233,7 @@ var Starfield = (function(){
         if (!color) color = Color.random();
         
         color = color.avg(Color.BLACK);
-        color.a = 0.5;
+        color.a(0.5);
         
         var ctx = this.context;
         var gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
@@ -321,10 +321,10 @@ function init(width, height) {
     var cNebula = new Starfield(document.getElementById('canvas2'), width, height);
     
     //cField.drawmode = Starfield.DRAW_GRADIENT;
-    sField.drawmode = Starfield.DRAW_DIAMOND;
-    nebula.drawmode = Starfield.DRAW_CLOUDS;
+    //sField.drawmode = Starfield.DRAW_DIAMOND;
+    //nebula.drawmode = Starfield.DRAW_CLOUDS;
     
-    for (var i = 0; i < 3; i++) cNebula.drawGradientCanvas();
+    //for (var i = 0; i < 3; i++) cNebula.drawGradientCanvas();
     
     //sField.generate(1000);
     cField.generate();
